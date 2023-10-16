@@ -1,2 +1,2 @@
 # Sensor-Data-Acquisition-Project
-Enhancing real-time data acquisition with EMG and ultrasound sensors, including algorithm development and deep learning model testing.
+This project focuses on advancing real-time data acquisition methods using Electromyography (EMG) and ultrasound sensors. We aim to develop cutting-edge algorithms and hardware to facilitate synchronized data collection. The collected data will be harnessed for testing and training neural network-based deep learning models. As part of the educational journey, students will engage in self-reflection, contribute to their academic field, and gain hands-on experience in data collection and analysis.
