@@ -5,6 +5,8 @@ import os
 
 # image will be 640x480
 
+# print(help(pyclariuscast))
+
 printStream = True
 
 
