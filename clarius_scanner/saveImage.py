@@ -3,12 +3,23 @@ import pyclariuscast
 from PIL import Image
 import os
 import time
+from typing import Final
 
 # image will be 640x480
 
 # print(help(pyclariuscast))
 
-printStream = True
+CMD_FREEZE: Final = 1
+CMD_CAPTURE_IMAGE: Final = 2
+CMD_CAPTURE_CINE: Final = 3
+CMD_DEPTH_DEC: Final = 4
+CMD_DEPTH_INC: Final = 5
+CMD_GAIN_DEC: Final = 6
+CMD_GAIN_INC: Final = 7
+CMD_B_MODE: Final = 12
+CMD_CFI_MODE: Final = 14
+
+printStream = False
 
 
 ## called when a new processed image is streamed
@@ -21,6 +32,7 @@ printStream = True
 # @param angle acquisition angle for volumetric data
 # @param imu inertial data tagged with the frame
 def newProcessedImage(image, width, height, sz, micronsPerPixel, timestamp, angle, imu):
+    # print("image")
     bpp = sz / (width * height)
     if printStream:
         print(
@@ -34,6 +46,7 @@ def newProcessedImage(image, width, height, sz, micronsPerPixel, timestamp, angl
     else:
         img = Image.frombytes("L", (width, height), image)
     img.save("processed_image.png")
+    print("image saved")
     return
 
 
@@ -83,10 +96,10 @@ def newSpectrumImage(
 ## called when freeze state changes
 # @param frozen the freeze state
 def freezeFn(frozen):
-    if frozen:
-        print("\nimaging frozen")
-    else:
-        print("imaging running")
+    # if frozen:
+    #     # print("\nimaging frozen")
+    # else:
+    #     # print("imaging running")
     return
 
 
@@ -101,12 +114,12 @@ def buttonsFn(button, clicks):
 ## main function
 def main():
     ip = "192.168.1.1"
-    port = 32981
+    port = 46673
     width = 640
     height = 480
 
     start_time = time.time()  # Record the start time
-    duration = 5  # Duration in seconds to save images
+    duration = 10  # Duration in seconds to save images
 
     # uncomment to get documentation for pyclariuscast module
     # print(help(pyclariuscast))
@@ -115,17 +128,23 @@ def main():
     path = os.path.expanduser("~/")
 
     # initialize
-    cast = pyclariuscast.Caster(
-        newProcessedImage, newRawImage, newSpectrumImage, freezeFn, buttonsFn
-    )
+    # cast = pyclariuscast.Caster(
+    #     newProcessedImage, newRawImage, newSpectrumImage, freezeFn, buttonsFn
+    # )
+
+    cast = pyclariuscast.Caster(newProcessedImage, newRawImage)
+
     ret = cast.init(path, width, height)
     if ret:
         print("initialization succeeded")
         ret = cast.connect(ip, port, "research")
         if ret:
             print("connected to {0} on port {1}".format(ip, port))
-            while time.time() - start_time < duration:
-                pass
+            cast.userFunction(CMD_FREEZE, 0)
+            # while time.time() - start_time < duration:
+            #     pass
+            # print("the end")
+
         else:
             print("connection failed")
             cast.destroy()
@@ -133,6 +152,29 @@ def main():
     else:
         print("initialization failed")
         return
+
+    # key = ""
+    # while True:
+    #     user_input = input("enter q to quit")
+    #     print("you Entered:", user_input)
+    #     key = user_input
+    #     if key == "q":
+    #         print("the end")
+    #         # cast.destroy()
+    #         return
+    #     print("the end")
+
+    userinput = ""
+    while userinput != "q":
+        userinput = input("enter q to quit: ")
+
+    print("quitting")
+
+    cast.userFunction(CMD_FREEZE, 0)
+
+    cast.destroy()
+
+    print("quit")
 
 
 if __name__ == "__main__":

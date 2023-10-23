@@ -100,7 +100,7 @@ def buttonsFn(button, clicks):
 ## main function
 def main():
     ip = "192.168.1.1"
-    port = 32981
+    port = 46673
     width = 640
     height = 480
 

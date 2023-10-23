@@ -34,7 +34,7 @@ def newProcessedImage(image, width, height, sz, micronsPerPixel, timestamp, angl
         img = Image.frombytes("RGBA", (width, height), image)
     else:
         img = Image.frombytes("L", (width, height), image)
-    # img.save("processed_image.png")
+    img.save("processed_image.png")
     return
 
 
@@ -138,7 +138,7 @@ def main():
     ret = cast.init(path, args.width, args.height)
     if ret:
         print("initialization succeeded")
-        ret = cast.connect(args.ip, args.port, "research")
+        ret = cast.connect("192.168.1.1", 46673, "research")
         if ret:
             print("connected to {0} on port {1}".format(args.ip, args.port))
         else:
