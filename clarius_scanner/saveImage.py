@@ -32,21 +32,21 @@ printStream = False
 # @param angle acquisition angle for volumetric data
 # @param imu inertial data tagged with the frame
 def newProcessedImage(image, width, height, sz, micronsPerPixel, timestamp, angle, imu):
-    # print("image")
-    bpp = sz / (width * height)
-    if printStream:
-        print(
-            "image: {0}, {1}x{2} @ {3} bpp, {4:.2f} um/px, imu: {5} pts".format(
-                timestamp, width, height, bpp, micronsPerPixel, len(imu)
-            ),
-            end="\r",
-        )
-    if bpp == 4:
-        img = Image.frombytes("RGBA", (width, height), image)
-    else:
-        img = Image.frombytes("L", (width, height), image)
-    img.save("processed_image.png")
-    print("image saved")
+    # # print("image")
+    # bpp = sz / (width * height)
+    # if printStream:
+    #     print(
+    #         "image: {0}, {1}x{2} @ {3} bpp, {4:.2f} um/px, imu: {5} pts".format(
+    #             timestamp, width, height, bpp, micronsPerPixel, len(imu)
+    #         ),
+    #         end="\r",
+    #     )
+    # if bpp == 4:
+    #     img = Image.frombytes("RGBA", (width, height), image)
+    # else:
+    #     img = Image.frombytes("L", (width, height), image)
+    # img.save("processed_image.png")
+    # print("prcessed image saved")
     return
 
 
@@ -64,17 +64,21 @@ def newProcessedImage(image, width, height, sz, micronsPerPixel, timestamp, angl
 def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg, rf, angle):
     # check the rf flag for radiofrequency data vs raw grayscale
     # raw grayscale data is non scan-converted and in polar co-ordinates
-    # print(
-    #    "raw image: {0}, {1}x{2} @ {3} bps, {4:.2f} um/s, {5:.2f} um/l, rf: {6}".format(
-    #        timestamp, lines, samples, bps, axial, lateral, rf
-    #    ), end = "\r"
-    # )
-    # if jpg == 0:
-    #    img = Image.frombytes("L", (samples, lines), image, "raw")
-    # else:
-    #    # note! this probably won't work unless a proper decoder is written
-    #    img = Image.frombytes("L", (samples, lines), image, "jpg")
-    # img.save("raw_image.jpg")
+    print(
+        "raw image: {0}, {1}x{2} @ {3} bps, {4:.2f} um/s, {5:.2f} um/l, rf: {6}".format(
+            timestamp, lines, samples, bps, axial, lateral, rf
+        ),
+        end="\r",
+    )
+    if jpg == 0:
+        img = Image.frombytes("L", (samples, lines), image, "raw")
+    else:
+        # note! this probably won't work unless a proper decoder is written
+        img = Image.frombytes("L", (samples, lines), image, "jpg")
+    if rf == 1:
+        img.save("raw_image.jpg")
+        print("raw image saved")
+
     return
 
 
@@ -90,6 +94,10 @@ def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg, rf, 
 def newSpectrumImage(
     image, lines, samples, bps, period, micronsPerSample, velocityPerSample, pw
 ):
+    if pw:
+        img = Image.frombytes("L", (samples, lines), image, "raw")
+    img.save("spectrumImage.jpg")
+    print("spectrum Image")
     return
 
 
@@ -114,7 +122,7 @@ def buttonsFn(button, clicks):
 ## main function
 def main():
     ip = "192.168.1.1"
-    port = 46673
+    port = 37197
     width = 640
     height = 480
 
@@ -128,11 +136,9 @@ def main():
     path = os.path.expanduser("~/")
 
     # initialize
-    # cast = pyclariuscast.Caster(
-    #     newProcessedImage, newRawImage, newSpectrumImage, freezeFn, buttonsFn
-    # )
-
-    cast = pyclariuscast.Caster(newProcessedImage, newRawImage)
+    cast = pyclariuscast.Caster(
+        newProcessedImage, newRawImage, newSpectrumImage, freezeFn, buttonsFn
+    )
 
     ret = cast.init(path, width, height)
     if ret:
