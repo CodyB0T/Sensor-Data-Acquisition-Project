@@ -4,6 +4,8 @@ from PIL import Image
 import os
 import time
 from typing import Final
+import pandas as pd
+
 
 # image will be 640x480
 
@@ -65,19 +67,22 @@ def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg, rf, 
     # check the rf flag for radiofrequency data vs raw grayscale
     # raw grayscale data is non scan-converted and in polar co-ordinates
     print(
-        "raw image: {0}, {1}x{2} @ {3} bps, {4:.2f} um/s, {5:.2f} um/l, rf: {6}".format(
-            timestamp, lines, samples, bps, axial, lateral, rf
+        "raw image: {0}, {1}x{2} @ {3} bps, {4:.2f} um/s, {5:.2f} um/l, jpg = {6} rf: {7}".format(
+            timestamp, lines, samples, bps, axial, lateral, jpg, rf
         ),
         end="\r",
     )
     if jpg == 0:
         img = Image.frombytes("L", (samples, lines), image, "raw")
-    else:
-        # note! this probably won't work unless a proper decoder is written
-        img = Image.frombytes("L", (samples, lines), image, "jpg")
+    # else:
+    #     # note! this probably won't work unless a proper decoder is written
+    #     img = Image.frombytes("L", (samples, lines), image, "jpg")
     if rf == 1:
-        img.save("raw_image.jpg")
-        print("raw image saved")
+        # df = pd.DataFrame(image)
+        # print(image)
+        print(list(img.getdata()))
+    # img.save("raw_image.jpg")
+    # print("raw image saved")
 
     return
 
@@ -122,7 +127,7 @@ def buttonsFn(button, clicks):
 ## main function
 def main():
     ip = "192.168.1.1"
-    port = 37197
+    port = 40321
     width = 640
     height = 480
 
@@ -169,6 +174,8 @@ def main():
     #         # cast.destroy()
     #         return
     #     print("the end")
+
+    printStream = False
 
     userinput = ""
     while userinput != "q":
