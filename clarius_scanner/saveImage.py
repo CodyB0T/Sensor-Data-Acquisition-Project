@@ -22,6 +22,7 @@ CMD_B_MODE: Final = 12
 CMD_CFI_MODE: Final = 14
 
 printStream = False
+onlyone = True
 
 
 ## called when a new processed image is streamed
@@ -70,19 +71,20 @@ def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg, rf, 
         "raw image: {0}, {1}x{2} @ {3} bps, {4:.2f} um/s, {5:.2f} um/l, jpg = {6} rf: {7}".format(
             timestamp, lines, samples, bps, axial, lateral, jpg, rf
         ),
-        end="\r",
+        # end="\r",
     )
     if jpg == 0:
         img = Image.frombytes("L", (samples, lines), image, "raw")
     # else:
     #     # note! this probably won't work unless a proper decoder is written
-    #     img = Image.frombytes("L", (samples, lines), image, "jpg")
-    if rf == 1:
-        # df = pd.DataFrame(image)
-        # print(image)
-        print(list(img.getdata()))
-    # img.save("raw_image.jpg")
-    # print("raw image saved")
+    #     img = Image.frombytes("L", (samples, lines), image, "jpg")q
+
+    if rf == 1 and onlyone == True and jpg == 0:
+        img.save("raw_image.jpg")
+        df = pd.DataFrame(list(img.getdata()))
+        df.to_csv("testData.csv", index=False)
+        # print(f"saved {lines}, {samples}")
+        # qonlyone = False
 
     return
 
@@ -99,11 +101,12 @@ def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg, rf, 
 def newSpectrumImage(
     image, lines, samples, bps, period, micronsPerSample, velocityPerSample, pw
 ):
-    if pw:
-        img = Image.frombytes("L", (samples, lines), image, "raw")
-    img.save("spectrumImage.jpg")
-    print("spectrum Image")
-    return
+    pass
+    # if pw:
+    #     img = Image.frombytes("L", (samples, lines), image, "raw")
+    # img.save("spectrumImage.jpg")
+    # print("spectrum Image")
+    # return
 
 
 ## called when freeze state changes
@@ -127,7 +130,7 @@ def buttonsFn(button, clicks):
 ## main function
 def main():
     ip = "192.168.1.1"
-    port = 40321
+    port = 41393
     width = 640
     height = 480
 
