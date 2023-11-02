@@ -80,11 +80,13 @@ def newRawImage(image, lines, samples, bps, axial, lateral, timestamp, jpg, rf, 
     #     img = Image.frombytes("L", (samples, lines), image, "jpg")q
 
     if rf == 1 and onlyone == True and jpg == 0:
+        print("test")
         img.save("raw_image.jpg")
-        df = pd.DataFrame(list(img.getdata()))
-        df.to_csv("testData.csv", index=False)
-        # print(f"saved {lines}, {samples}")
-        # qonlyone = False
+        # df = pd.DataFrame(list(img.getdata()))
+        # print(df)
+        # df.to_csv("testData.csv", index=False)
+        # # print(f"saved {lines}, {samples}")
+        # onlyone = False
 
     return
 
@@ -130,7 +132,7 @@ def buttonsFn(button, clicks):
 ## main function
 def main():
     ip = "192.168.1.1"
-    port = 41393
+    port = 39641
     width = 640
     height = 480
 
