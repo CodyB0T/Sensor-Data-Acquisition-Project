@@ -7,7 +7,7 @@
 #include <thread>
 
 #ifdef _MSC_VER
-#include <boost/program_options.hpp>
+//#include <boost/program_options.hpp>
 #else
 #include <unistd.h>
 #endif
@@ -438,78 +438,78 @@ int init(int& argc, char** argv)
     // ensure console buffers are flushed automatically
     setvbuf(stdout, nullptr, _IONBF, 0) != 0 || setvbuf(stderr, nullptr, _IONBF, 0);
 
-    // Windows: Visual C++ doesn't have 'getopt' so use Boost's program_options instead
-#ifdef _MSC_VER
-    namespace po = boost::program_options;
-    keydir = "c:/";
+//     // Windows: Visual C++ doesn't have 'getopt' so use Boost's program_options instead
+// #ifdef _MSC_VER
+//     namespace po = boost::program_options;
+//     keydir = "c:/";
 
-    try
-    {
-        po::options_description desc("Usage: 192.168.1.21", 12345);
-        desc.add_options()
-            ("help", "produce help message")
-            //("address", po::value<std::string>(&ipAddr)->required(), "set the IP address of the host scanner")
-            //("port", po::value<unsigned int>(&port)->required(), "set the port of the host scanner")
-            ("keydir", po::value<std::string>(&keydir)->default_value("/tmp/"), "set the path containing the security keys")
-            ;
+//     try
+//     {
+//         po::options_description desc("Usage: 192.168.1.21", 12345);
+//         desc.add_options()
+//             ("help", "produce help message")
+//             //("address", po::value<std::string>(&ipAddr)->required(), "set the IP address of the host scanner")
+//             //("port", po::value<unsigned int>(&port)->required(), "set the port of the host scanner")
+//             ("keydir", po::value<std::string>(&keydir)->default_value("/tmp/"), "set the path containing the security keys")
+//             ;
 
-        po::variables_map vm;
-        po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);
+//         po::variables_map vm;
+//         po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);
 
-        if (vm.count("help"))
-        {
-            PRINT << desc << std::endl;
-            return CUS_FAILURE;
-        }
+//         if (vm.count("help"))
+//         {
+//             PRINT << desc << std::endl;
+//             return CUS_FAILURE;
+//         }
 
-        po::notify(vm);
-    }
-    catch (std::exception& e)
-    {
-        ERROR << "Error: " << e.what() << std::endl;
-        return CUS_FAILURE;
-    }
-    catch (...)
-    {
-        ERROR << "Unknown error!" << std::endl;
-        return CUS_FAILURE;
-    }
-#else // every other platform has 'getopt' which we're using so as to not pull in the Boost dependency
-    int o;
-    keydir = "/tmp/";
+//         po::notify(vm);
+//     }
+//     catch (std::exception& e)
+//     {
+//         ERROR << "Error: " << e.what() << std::endl;
+//         return CUS_FAILURE;
+//     }
+//     catch (...)
+//     {
+//         ERROR << "Unknown error!" << std::endl;
+//         return CUS_FAILURE;
+//     }
+// #else // every other platform has 'getopt' which we're using so as to not pull in the Boost dependency
+//     int o;
+//     keydir = "/tmp/";
 
-    // check command line options
-    while ((o = getopt(argc, argv, "k:a:p:")) != -1)
-    {
-        switch (o)
-        {
-            // security key directory
-        case 'k': keydir = optarg; break;
-            // ip address
-        case 'a': ipAddr = optarg; break;
-            // port
-        case 'p':
-            try { port = std::stoi(optarg); }
-            catch (std::exception&) { PRINT << port; }
-            break;
-            // invalid argument
-        case '?': PRINT << "invalid argument, valid options: -a [addr], -p [port], -k [keydir]"; break;
-        default: break;
-        }
-    }
+//     // check command line options
+//     while ((o = getopt(argc, argv, "k:a:p:")) != -1)
+//     {
+//         switch (o)
+//         {
+//             // security key directory
+//         case 'k': keydir = optarg; break;
+//             // ip address
+//         case 'a': ipAddr = optarg; break;
+//             // port
+//         case 'p':
+//             try { port = std::stoi(optarg); }
+//             catch (std::exception&) { PRINT << port; }
+//             break;
+//             // invalid argument
+//         case '?': PRINT << "invalid argument, valid options: -a [addr], -p [port], -k [keydir]"; break;
+//         default: break;
+//         }
+//     }
 
-    if (!ipAddr.size())
-    {
-        ERROR << "no ip address provided. run with '-a [addr]" << std::endl;
-        return CUS_FAILURE;
-    }
+//     if (!ipAddr.size())
+//     {
+//         ERROR << "no ip address provided. run with '-a [addr]" << std::endl;
+//         return CUS_FAILURE;
+//     }
 
-    if (!port)
-    {
-        ERROR << "no casting port provided. run with '-p [port]" << std::endl;
-        return CUS_FAILURE;
-    }
-#endif
+//     if (!port)
+//     {
+//         ERROR << "no casting port provided. run with '-p [port]" << std::endl;
+//         return CUS_FAILURE;
+//     }
+// #endif
 
     PRINT << "starting caster...";
 
