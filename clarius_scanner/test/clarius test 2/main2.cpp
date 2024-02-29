@@ -7,7 +7,7 @@
 #include <thread>
 
 #ifdef _MSC_VER
-#include <boost/program_options.hpp>
+//#include <boost/program_options.hpp>
 #else
 #include <unistd.h>
 #endif
@@ -80,10 +80,10 @@ void newRawImageFn(const void* newImage, const CusRawImageInfo* nfo, int npos, c
 #ifdef PRINTRAW
     if (nfo->rf)
         PRINT << "new rf data (" << newImage << "): " << nfo->lines << " x " << nfo->samples << " @ " << nfo->bitsPerSample
-          << "bits. @ " << nfo->axialSize << " microns per sample. imu points: " << npos;
+        << "bits. @ " << nfo->axialSize << " microns per sample. imu points: " << npos;
     else
         PRINT << "new pre-scan data (" << newImage << "): " << nfo->lines << " x " << nfo->samples << " @ " << nfo->bitsPerSample
-          << "bits. @ " << nfo->axialSize << " microns per sample. imu points: " << npos << " jpeg size: " << (int)nfo->jpeg;
+        << "bits. @ " << nfo->axialSize << " microns per sample. imu points: " << npos << " jpeg size: " << (int)nfo->jpeg;
 
     if (npos)
         printImuData(npos, pos);
@@ -105,7 +105,7 @@ void newProcessedImageFn(const void* newImage, const CusProcessedImageInfo* nfo,
     (void)pos;
     if (streamOutput_)
         PRINTSL << "new image (" << counter_++ << "): " << nfo->width << " x " << nfo->height << " @ " << nfo->bitsPerPixel << " bpp. @ "
-                << nfo->imageSize << "bytes. @ " << nfo->micronsPerPixel << " microns per pixel. imu points: " << npos << std::flush;
+        << nfo->imageSize << "bytes. @ " << nfo->micronsPerPixel << " microns per pixel. imu points: " << npos << std::flush;
 }
 
 /// callback for a new spectral image sent from the scanner
@@ -116,7 +116,7 @@ void newSpectralImageFn(const void* newImage, const CusSpectralImageInfo* nfo)
     (void)newImage;
     if (streamOutput_)
         PRINTSL << "new spectrum: " << nfo->lines << " x " << nfo->samples << " @ " << nfo->bitsPerSample
-              << "bits. @ " << nfo->period << " sec/line." << std::flush;
+        << "bits. @ " << nfo->period << " sec/line." << std::flush;
 }
 
 /// saves raw data from the current download buffer
@@ -127,19 +127,19 @@ bool saveRawData()
         return false;
 
     auto cleanup = []()
-    {
-        free(buffer_);
-        buffer_ = nullptr;
-        szRawData_ = 0;
-    };
+        {
+            free(buffer_);
+            buffer_ = nullptr;
+            szRawData_ = 0;
+        };
 
     FILE* fp = nullptr;
     // save raw data to disk as a compressed file
-    #ifdef _MSC_VER
-        fopen_s(&fp, "raw_data.tar", "wb+");
-    #else
-        fp = fopen("raw_data.tar", "wb+");
-    #endif
+#ifdef _MSC_VER
+    fopen_s(&fp, "raw_data.tar", "wb+");
+#else
+    fp = fopen("raw_data.tar", "wb+");
+#endif
     if (!fp)
     {
         cleanup();
@@ -244,22 +244,22 @@ void processEventLoop(std::atomic_bool& quit)
         }
         else if (cmd == 'R' || cmd == 'r')
         {
-            if (cusCastRequestRawData(0, 0, 1, [](int sz, const char*)
-            {
-                if (sz < 0)
-                    ERROR << "error requesting raw data" << std::endl;
-                else if (sz == 0)
+            if (cusCastRequestRawData(0, 0, 1, [](int sz)
                 {
-                    szRawData_ = 0;
-                    ERROR << "no raw data buffered" << std::endl;
-                }
-                else
-                {
-                    szRawData_ = sz;
-                    PRINT << "raw data file of size " << sz << "B ready to download";
-                }
+                    if (sz < 0)
+                        ERROR << "error requesting raw data" << std::endl;
+                    else if (sz == 0)
+                    {
+                        szRawData_ = 0;
+                        ERROR << "no raw data buffered" << std::endl;
+                    }
+                    else
+                    {
+                        szRawData_ = sz;
+                        PRINT << "raw data file of size " << sz << "B ready to download";
+                    }
 
-            }) < 0)
+                }) < 0)
                 ERROR << "error requesting raw data" << std::endl;
         }
         else if (cmd == 'Y' || cmd == 'y')
@@ -271,13 +271,13 @@ void processEventLoop(std::atomic_bool& quit)
                 buffer_ = (char*)malloc(szRawData_);
 
                 if (cusCastReadRawData((void**)(&buffer_), [](int ret)
-                {
-                    if (ret == CUS_SUCCESS)
                     {
-                        PRINT << "successfully downloaded raw data" << std::endl;
-                        saveRawData();
-                    }
-                }) < 0)
+                        if (ret == CUS_SUCCESS)
+                        {
+                            PRINT << "successfully downloaded raw data" << std::endl;
+                            saveRawData();
+                        }
+                    }) < 0)
                     ERROR << "error downloading raw data" << std::endl;
             }
         }
@@ -354,7 +354,7 @@ void processEventLoop(std::atomic_bool& quit)
                 ERROR << "failed to add label to capture" << std::endl;
             else
                 PRINT << "added measurement '" << prms.back() << "' from (" << x1 << ", " << y1 << ") "
-                    << "to (" << x2 << ", " << y2 << ") to capture" << std::endl;
+                << "to (" << x2 << ", " << y2 << ") to capture" << std::endl;
         }
         else if (cmd == 'p' || cmd == 'P')
         {
@@ -369,10 +369,10 @@ void processEventLoop(std::atomic_bool& quit)
             if (prms[1] == "true" || prms[1] == "false")
             {
                 if (cusCastEnableParameter(prms[0].c_str(), (prms[1] == "true"), [](int ret)
-                {
-                    if (ret == CUS_FAILURE)
-                        ERROR << "parameter enable/disable failed";
-                }) < 0)
+                    {
+                        if (ret == CUS_FAILURE)
+                            ERROR << "parameter enable/disable failed";
+                    }) < 0)
                 {
                     ERROR << "parameter enable/disable failed";
                 }
@@ -380,10 +380,10 @@ void processEventLoop(std::atomic_bool& quit)
             else if (prm.find("pulse") != std::string::npos)
             {
                 if (cusCastSetPulse(prms[0].c_str(), prms[1].c_str(), [](int ret)
-                {
-                    if (ret == CUS_FAILURE)
-                        ERROR << "parameter pulse shape set failed";
-                }) < 0)
+                    {
+                        if (ret == CUS_FAILURE)
+                            ERROR << "parameter pulse shape set failed";
+                    }) < 0)
                 {
                     ERROR << "parameter pulse shape set failed";
                 }
@@ -397,10 +397,10 @@ void processEventLoop(std::atomic_bool& quit)
                     continue;
                 }
                 if (cusCastSetParameter(prms[0].c_str(), val, [](int ret)
-                {
-                    if (ret == CUS_FAILURE)
-                        ERROR << "parameter setting parameter";
-                }) < 0)
+                    {
+                        if (ret == CUS_FAILURE)
+                            ERROR << "parameter setting parameter";
+                    }) < 0)
                 {
                     ERROR << "parameter setting parameter";
                 }
@@ -420,88 +420,19 @@ void processEventLoop(std::atomic_bool& quit)
 
 int init(int& argc, char** argv)
 {
-    const int width  = 640;
+    const int width = 640;
     const int height = 480;
-    std::string keydir, ipAddr;
-    unsigned int port = 0;
+    std::string keydir;
+    std::string ipAddr = "192.168.1.1";
+    unsigned int port = 5828;
 
     // ensure console buffers are flushed automatically
     setvbuf(stdout, nullptr, _IONBF, 0) != 0 || setvbuf(stderr, nullptr, _IONBF, 0);
 
-    // Windows: Visual C++ doesn't have 'getopt' so use Boost's program_options instead
-#ifdef _MSC_VER
-    namespace po = boost::program_options;
-    keydir = "c:/";
+   
 
-    try
-    {
-        po::options_description desc("Usage: 192.168.1.21", 12345);
-        desc.add_options()
-            ("help", "produce help message")
-            ("address", po::value<std::string>(&ipAddr)->required(), "set the IP address of the host scanner")
-            ("port", po::value<unsigned int>(&port)->required(), "set the port of the host scanner")
-            ("keydir", po::value<std::string>(&keydir)->default_value("/tmp/"), "set the path containing the security keys")
-        ;
-
-        po::variables_map vm;
-        po::store(po::command_line_parser(argc, argv).options(desc).allow_unregistered().run(), vm);
-
-        if (vm.count("help"))
-        {
-            PRINT << desc << std::endl;
-            return CUS_FAILURE;
-        }
-
-        po::notify(vm);
-    }
-    catch (std::exception& e)
-    {
-        ERROR << "Error: " << e.what() << std::endl;
-        return CUS_FAILURE;
-    }
-    catch (...)
-    {
-        ERROR << "Unknown error!" << std::endl;
-        return CUS_FAILURE;
-    }
-#else // every other platform has 'getopt' which we're using so as to not pull in the Boost dependency
-    int o;
-    keydir = "/tmp/";
-
-    // check command line options
-    while ((o = getopt(argc, argv, "k:a:p:")) != -1)
-    {
-        switch (o)
-        {
-        // security key directory
-        case 'k': keydir = optarg; break;
-        // ip address
-        case 'a': ipAddr = optarg; break;
-        // port
-        case 'p':
-            try { port = std::stoi(optarg); }
-            catch (std::exception&) { PRINT << port; }
-            break;
-        // invalid argument
-        case '?': PRINT << "invalid argument, valid options: -a [addr], -p [port], -k [keydir]"; break;
-        default: break;
-        }
-    }
-
-    if (!ipAddr.size())
-    {
-        ERROR << "no ip address provided. run with '-a [addr]" << std::endl;
-        return CUS_FAILURE;
-    }
-
-    if (!port)
-    {
-        ERROR << "no casting port provided. run with '-p [port]" << std::endl;
-        return CUS_FAILURE;
-    }
-#endif
-
-    PRINT << "starting caster...";
+    std::cout << "starting caster..." << std::endl;
+    std::cout << "test" << std::endl;
 
     // initialize with callbacks
     if (cusCastInit(argc, argv, keydir.c_str(), newProcessedImageFn, newRawImageFn, newSpectralImageFn, nullptr, freezeFn, buttonFn, progressFn, errorFn, width, height) < 0)
@@ -510,17 +441,17 @@ int init(int& argc, char** argv)
         return CUS_FAILURE;
     }
     if (cusCastConnect(ipAddr.c_str(), port, "research", [](int port, int swRevMatch)
-    {
-        if (port == CUS_FAILURE)
-            ERROR << "could not connect to scanner" << std::endl;
-        else
         {
-            PRINT << "...connected, streaming port: " << port << " -- check firewall settings if no image callback received";
-            if (swRevMatch == CUS_FAILURE)
-                ERROR << "software revisions do not match" << std::endl;
-        }
+            if (port == CUS_FAILURE)
+                ERROR << "could not connect to scanner" << std::endl;
+            else
+            {
+                std::cout << "...connected, streaming port: " << port << " -- check firewall settings if no image callback received" << std::endl;
+                // if (swRevMatch == CUS_FAILURE)
+                //     ERROR << "software revisions do not match" << std::endl;
+            }
 
-    }) < 0)
+        }) < 0)
     {
         ERROR << "connection attempt failed" << std::endl;
         return CUS_FAILURE;
@@ -539,8 +470,9 @@ int main(int argc, char* argv[])
     if (rcode == CUS_SUCCESS)
     {
         std::atomic_bool quitFlag(false);
-        std::thread eventLoop(processEventLoop, std::ref(quitFlag));
-        eventLoop.join();
+        processEventLoop(quitFlag);
+        // std::thread eventLoop(processEventLoop, std::ref(quitFlag));
+        // eventLoop.join();
     }
 
     cusCastDestroy();

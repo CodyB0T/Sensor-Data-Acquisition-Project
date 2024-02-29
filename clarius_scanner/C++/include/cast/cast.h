@@ -12,6 +12,7 @@ extern "C"
     /// @param[in] newProcessedImage new processed image callback (scan-converted image)
     /// @param[in] newRawImage new raw image callback - (pre scan-converted image or rf signal)
     /// @param[in] newSpectralImage new processed spectral image callback
+    /// @param[in] newImuData new imu data callback
     /// @param[in] freeze freeze state callback
     /// @param[in] btn button press callback
     /// @param[in] progress readback progress callback
@@ -28,6 +29,7 @@ extern "C"
         CusNewProcessedImageFn newProcessedImage,
         CusNewRawImageFn newRawImage,
         CusNewSpectralImageFn newSpectralImage,
+        CusNewImuDataFn newImuData,
         CusFreezeFn freeze,
         CusButtonFn btn,
         CusProgressFn progress,
@@ -108,16 +110,24 @@ extern "C"
     /// @retval -1 the format could not be set
     CAST_EXPORT int cusCastSetFormat(CusImageFormat format);
 
+    /// makes a request to return the availability of all the raw data currently buffered on the probe
+    /// @param[in] fn result callback function that will return all the timestamps of the data blocks that are buffered
+    /// @return success of the call
+    /// @retval 0 the request was successfully made
+    /// @retval -1 the request could not be made
+    /// @note the probe must be frozen with raw data buffering enabled prior to calling the function
+    CAST_EXPORT int cusCastRawDataAvailability(CusRawAvailabilityFn fn);
+
     /// makes a request for raw data from the probe
     /// @param[in] start the first frame to request, as determined by timestamp in nanoseconds, set to 0 along with end to requests all data in buffer
     /// @param[in] end the last frame to request, as determined by timestamp in nanoseconds, set to 0 along with start to requests all data in buffer
     /// @param[in] lzo flag to specify a tarball with lzo compressed raw data inside (default) vs no compression of raw data
-    /// @param[in] fn callback to obtain the raw data size result, -1 if the request failed, 0 if no raw data exists, otherwise the raw data size
+    /// @param[in] fn result callback function, will return size of buffer required upon success, 0 if no raw data was buffered, or -1 if request could not be made
     /// @return success of the call
     /// @retval 0 the request was successfully made
     /// @retval -1 the request could not be made
     /// @note the probe must be frozen and in a raw data buffering mode in order for the call to succeed
-    CAST_EXPORT int cusCastRequestRawData(long long int start, long long int end, int lzo, CusRawFn fn);
+    CAST_EXPORT int cusCastRequestRawData(long long int start, long long int end, int lzo, CusRawRequestFn fn);
 
     /// retrieves raw data from a previous request
     /// @param[out] data a pointer to a buffer that has been allocated to read the raw data into, this must be pre-allocated with
