@@ -36,7 +36,9 @@ void errorFn(const char* err)
 /// @param[in] val the freeze state value, 1 = frozen, 0 = imaging
 void freezeFn(int val)
 {
-    PRINT << (val ? "frozen" : "imaging");
+    // PRINT << (val ? "frozen" : "imaging");
+    std::cout << (val ? "frozen" : "imaging") << std::endl;
+    std::cout.flush();
     counter_ = 0;
 }
 
@@ -259,7 +261,7 @@ void processEventLoop(std::atomic_bool& quit)
                     else
                     {
                         szRawData_ = sz;
-                        PRINT << "raw data file of size " << sz << "B ready to download";
+                        std::cout << "raw data file of size " << sz << "B ready to download"<< std::endl;
                     }
 
                 }) < 0)

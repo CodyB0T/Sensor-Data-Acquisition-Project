@@ -22,6 +22,7 @@ class Clarius:
     def read_output(self, stream, output_type):
         for line in stream:
             print(f"Received {output_type}: {line.strip()}")
+            self.output = line
 
     def listen_for_output(self):
         self.read_output(self.process.stdout, "stdout")
@@ -34,6 +35,9 @@ class Clarius:
         self.process.stdin.write("f" + "\n")
         self.process.stdin.flush()
         time.sleep(delay)
+        self.process.stdin.write("f" + "\n")
+        self.process.stdin.flush()
+
         cmd = ["f", "r", "y"]
         for x in cmd:
             print(x)
@@ -41,8 +45,13 @@ class Clarius:
             self.process.stdin.flush()
             time.sleep(10)
         time.sleep(5)
-        # self.quit()
 
     def quit(self):
         self.process.stdin.write("q" + "\n")
         self.process.stdin.flush()
+
+
+if __name__ == "__main__":
+    clar = Clarius()
+    clar.clarius_record(5)
+    clar.quit()
