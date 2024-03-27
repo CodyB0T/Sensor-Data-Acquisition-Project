@@ -8,7 +8,7 @@ from mindrove.board_shim import BoardShim, MindRoveInputParams, BoardIds
 # from mindrove.data_filter import DataFilter, FilterTypes, AggOperations
 
 
-class EMG:
+class emg:
     def __init__(self):
         params = MindRoveInputParams()
         self.board_id = BoardIds.MINDROVE_WIFI_BOARD

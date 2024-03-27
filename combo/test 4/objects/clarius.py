@@ -3,7 +3,7 @@ import threading
 import time
 
 
-class Clarius:
+class clarius:
     def __init__(self):
         self.process = subprocess.Popen(
             ["./main"],
@@ -30,7 +30,7 @@ class Clarius:
     def listen_for_error(self):
         self.read_output(self.process.stderr, "stderr")
 
-    def clarius_record(self, delay):
+    def record(self, delay):
         print("clar start")
         self.process.stdin.write("f" + "\n")
         self.process.stdin.flush()
@@ -68,9 +68,9 @@ class Clarius:
 
 
 if __name__ == "__main__":
-    clar = Clarius()
+    clar = clarius()
     time.sleep(3)
-    t = threading.Thread(target=clar.clarius_record, args=(5,))
+    t = threading.Thread(target=clar.record, args=(5,))
     t.start()
     t.join()
     clar.quit()
