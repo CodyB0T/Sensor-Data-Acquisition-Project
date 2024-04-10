@@ -42,6 +42,7 @@ else:
     ddata = bytes()
     numbytes = 0
     framesize = 10  # 1byte packet type + 3byte timestamp + 3x2byte Analog Accel
+    logx = []
 
     print("Packet Type,Timestamp,Analog Accel X,Analog Accel Y,Analog Accel Z")
     try:
@@ -66,6 +67,7 @@ else:
                 "0x%02x,%5d,\t%4d,%4d,%4d"
                 % (packettype[0], timestamp, analogaccelx, analogaccely, analogaccelz)
             )
+            xlog += analogaccelx
 
     except KeyboardInterrupt:
         # send stop streaming command
