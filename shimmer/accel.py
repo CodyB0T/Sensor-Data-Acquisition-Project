@@ -54,6 +54,7 @@ else:
     ddata = bytes()
     numbytes = 0
     framesize = 10  # 1byte packet type + 3byte timestamp + 3x2byte Analog Accel
+    logx = []
 
     xlog = []
 
