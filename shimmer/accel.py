@@ -38,7 +38,7 @@ else:
     #     struct.pack("BBB", 0x05, 0x00, 0x19)
     #                              right, left
     # )  # 5.12Hz (6400 = (0x1900)). Has to be done like this for alignment reasons
-    # 2^15 / 6400 = 5.12
+    # 2^15 / 6400 = 5.12hz
 
     ser.write(struct.pack("BBB", 0x05, 0x3E, 0x00))  # 550 hz
 
