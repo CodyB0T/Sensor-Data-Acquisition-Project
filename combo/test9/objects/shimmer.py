@@ -112,5 +112,5 @@ class shimmer:
 
 if __name__ == "__main__":
     shim = shimmer()
-    if shim.connect("com8", sampling_rate=500):
+    if shim.connect("com4", sampling_rate=500):
         print("connected")
