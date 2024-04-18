@@ -10,8 +10,8 @@ import time
 class shimmer:
     def connect(self, port, baud=115200, sampling_rate=500):
         try:
-            self.ser = serial.Serial(port, baud)
-            self.ser.flushInput()
+            self.ser = serial.Serial(port, baud, timeout=1)
+            # self.ser.flushInput()
             print("shimmer connected")
             self.ser.write(struct.pack("BBBB", 0x08, 0x80, 0x00, 0x00))  # analogaccel
             self.wait_for_ack()
@@ -19,8 +19,10 @@ class shimmer:
             self.set_sampling_rate(sampling_rate)
             print("sampling rate set to " + str(sampling_rate))
             return True
-        except serial.SerialException:
+        except serial.SerialException and KeyboardInterrupt:
             print("failed to connect to " + str(port))
+            if self.ser is not None:
+                self.ser.close()
             return False
 
     def wait_for_ack(self):
@@ -76,6 +78,7 @@ class shimmer:
         xlog = []
         ylog = []
         zlog = []
+        the_time = []
 
         start_time = time.time()
         while time.time() - start_time < record_duration:
@@ -102,15 +105,17 @@ class shimmer:
             xlog.append(analogaccelx)
             ylog.append(analogaccely)
             zlog.append(analogaccelz)
+            the_time.append(timestamp)
 
-        data = {"x": xlog, "y": ylog, "z": zlog}
+        data = [xlog, ylog, zlog, the_time]
 
-        pd.DataFrame(data).to_csv("data/shimmer_data.csv", index=False, header=False)
+        pd.DataFrame(data).to_csv("data/shimmer_data.csv", index=False)
 
         self.end()
 
 
 if __name__ == "__main__":
     shim = shimmer()
-    if shim.connect("com4", sampling_rate=500):
-        print("connected")
+    if shim.connect("com8", sampling_rate=500):
+        # print("connected")
+        shim.record(5)

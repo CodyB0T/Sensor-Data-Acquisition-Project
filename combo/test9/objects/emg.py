@@ -31,20 +31,19 @@ class emg:
         self.board_shim.release_session()
         print("emg done")
 
-    def get_EEG(self):
+    def get_EEG(self, path):
         eeg_channels = BoardShim.get_eeg_channels(self.board_id)
-        return self.data[eeg_channels]
-        # df = pd.DataFrame(data)
-        # df.to_csv("eeg_data.csv", index=False)
+        pd.DataFrame(self.data[eeg_channels]).to_csv(path, index=False)
+        # return self.data[eeg_channels]
 
-    def get_acceleration(self):
-        eeg_channels = BoardShim.get_eeg_channels(self.board_id)
-        return self.data[eeg_channels]
-        # df = pd.DataFrame(data)
-        # df.to_csv("eeg_data.csv", index=False)
+    def get_acceleration(self, path):
+        accel_channels = BoardShim.get_accel_channels(self.board_id)
+        pd.DataFrame(self.data[accel_channels]).to_csv(path, index=False)
+        # return self.data[accel_channels]
 
-    def get_timestamp(self):
+    def get_timestamp(self, path):
         timeStamp = BoardShim.get_timestamp_channel(self.board_id)
+        pd.DataFrame(self.data[timeStamp]).to_csv(path, index=False)
         return self.data[timeStamp]
 
     def get_battery(self):
@@ -71,7 +70,8 @@ class emg:
 if __name__ == "__main__":
     emg = emg()
     period = 5
-    emg_thread = threading.Thread(target=emg.record, args=(period,))
-    emg_thread.start()
-    emg_thread.join()
-    pd.DataFrame(emg.get_EEG()).to_csv("data_emg.csv", index=False)
+    emg.record(5)
+
+    emg.get_EEG("data/data_eeg.csv")
+    emg.get_acceleration("data/data_imu.csv")
+    emg.get_timestamp("data/emg_timestamp.csv")
