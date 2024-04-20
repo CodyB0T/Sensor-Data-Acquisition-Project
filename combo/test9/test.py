@@ -6,7 +6,7 @@ from objects.clarius import clarius
 from objects.emg import emg
 from objects.shimmer import shimmer
 
-record_duration = 5  # length in seconds to record, max 10-20 sec
+record_duration = 10  # length in seconds to record, max 10-20 sec
 
 emg = emg()
 # clar = clarius()
@@ -18,7 +18,7 @@ shim_thread = threading.Thread(target=shim.record, args=(record_duration,))
 
 time.sleep(3)  # wait for the deiveces to connect
 
-if shim.connect("com8", sampling_rate=500):
+if shim.connect("com4", sampling_rate=500):
     emg_thread.start()
     # clar_thread.start()
     shim_thread.start()

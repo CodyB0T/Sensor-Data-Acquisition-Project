@@ -80,8 +80,8 @@ class shimmer:
         zlog = []
         the_time = []
 
-        start_time = time.time()
-        while time.time() - start_time < record_duration:
+        self.start_time = time.time()
+        while time.time() - self.start_time < record_duration:
             while numbytes < framesize:
                 ddata += self.ser.read(framesize)
                 numbytes = len(ddata)
@@ -107,15 +107,23 @@ class shimmer:
             zlog.append(analogaccelz)
             the_time.append(timestamp)
 
+        self.end_time = time.time()
+
         data = [xlog, ylog, zlog, the_time]
 
         pd.DataFrame(data).to_csv("data/shimmer_data.csv", index=False)
+
+        print(len(xlog) / (self.end_time - self.start_time))
 
         self.end()
 
 
 if __name__ == "__main__":
     shim = shimmer()
-    if shim.connect("com8", sampling_rate=500):
-        # print("connected")
-        shim.record(5)
+    if shim.connect("com4", sampling_rate=500):
+        print("connected")
+        shim.record(1)
+# 452.1
+# 452.9
+# 453.04
+# 453
