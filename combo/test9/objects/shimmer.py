@@ -8,19 +8,25 @@ import time
 
 
 class shimmer:
-    def connect(self, port, baud=115200, sampling_rate=500):
+    def __init__(self, port, baud=115200, sampling_rate=500):
+        self.port = port
+        self.baud = baud
+        self.set_sampling_rate = sampling_rate
+
+    def connect(self):
         try:
-            self.ser = serial.Serial(port, baud, timeout=1)
+            self.ser = serial.Serial(self.port, self.baud, timeout=1)
             # self.ser.flushInput()
             print("shimmer connected")
             self.ser.write(struct.pack("BBBB", 0x08, 0x80, 0x00, 0x00))  # analogaccel
             self.wait_for_ack()
             print("sensor setting, done.")
-            self.set_sampling_rate(sampling_rate)
-            print("sampling rate set to " + str(sampling_rate))
+            self.set_sampling_rate(self.sampling_rate)
+            print("sampling rate set to " + str(self.sampling_rate))
+            print(f"{self.port} connect successfully")
             return True
         except serial.SerialException and KeyboardInterrupt:
-            print("failed to connect to " + str(port))
+            print("failed to connect to " + str(self.port))
             if self.ser is not None:
                 self.ser.close()
             return False
@@ -64,8 +70,8 @@ class shimmer:
         self.ser.close()
         print("All done")
 
-    def record(self, record_duration):
-
+    def record(self, record_duration, path):
+        # self.connect(port, sampling_rate=500)
         # send start streaming command
         self.ser.write(struct.pack("B", 0x07))
         self.wait_for_ack()
@@ -99,8 +105,15 @@ class shimmer:
             timestamp = timestamp0 + timestamp1 * 256 + timestamp2 * 65536
 
             print(
-                "0x%02x,%5d,\t%4d,%4d,%4d"
-                % (packettype[0], timestamp, analogaccelx, analogaccely, analogaccelz)
+                "%s0x%02x,%5d,\t%4d,%4d,%4d"
+                % (
+                    self.port,
+                    packettype[0],
+                    timestamp,
+                    analogaccelx,
+                    analogaccely,
+                    analogaccelz,
+                )
             )
             xlog.append(analogaccelx)
             ylog.append(analogaccely)
@@ -111,7 +124,8 @@ class shimmer:
 
         data = [xlog, ylog, zlog, the_time]
 
-        pd.DataFrame(data).to_csv("data/shimmer_data.csv", index=False)
+        # pd.DataFrame(data).to_csv("data/shimmer_data.csv", index=False)
+        pd.DataFrame(data).to_csv(path, index=False)
 
         print(len(xlog) / (self.end_time - self.start_time))
 
@@ -119,10 +133,11 @@ class shimmer:
 
 
 if __name__ == "__main__":
-    shim = shimmer()
-    if shim.connect("com4", sampling_rate=500):
-        print("connected")
-        shim.record(1)
+    shim = shimmer("com7", sampling_rate=500)
+    if shim.connect():
+        print(f"connected to {shim.port}")
+
+
 # 452.1
 # 452.9
 # 453.04
