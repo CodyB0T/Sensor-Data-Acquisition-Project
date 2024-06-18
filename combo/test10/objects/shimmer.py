@@ -11,7 +11,7 @@ class shimmer:
     def __init__(self, port, baud=115200, sampling_rate=500):
         self.port = port
         self.baud = baud
-        self.set_sampling_rate = sampling_rate
+        self.sampling_rate = sampling_rate
 
     def connect(self):
         try:

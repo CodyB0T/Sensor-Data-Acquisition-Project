@@ -17,7 +17,7 @@ if emg_enable:
     emg_thread = threading.Thread(target=emg.record, args=(record_duration,))
 
 if clar_enable:
-    clar = clarius()
+    clar = clarius
     clar_thread = threading.Thread(target=clar.record, args=(record_duration,))
 
 if shimmer_enable:
@@ -40,9 +40,7 @@ if shimmer_enable:
         )
 
 
-# time.sleep(3)  # wait for the deiveces to connect
-
-
+time.sleep(3)  # wait for the deiveces to connect
 if emg_enable:
     emg_thread.start()
 
@@ -64,6 +62,6 @@ if clar_enable:
     clar_thread.join()
     clar.quit()
 
-# if shimmer_enable:
-#     shim_thread.join()
-#     shim2_thread.join()
+if shimmer_enable:
+    shim_thread.join()
+    shim2_thread.join()
