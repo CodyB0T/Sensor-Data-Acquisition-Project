@@ -17,7 +17,7 @@ if emg_enable:
     emg_thread = threading.Thread(target=emg.record, args=(record_duration,))
 
 if clar_enable:
-    clar = clarius
+    clar = clarius()
     clar_thread = threading.Thread(target=clar.record, args=(record_duration,))
 
 if shimmer_enable:
